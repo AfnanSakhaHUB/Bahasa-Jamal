@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Penerjemah Bahasa Jamal (Jamal Language Translator)</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        jamal: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            400: '#4ade80',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                            glow: '#10b981'
+                        }
+                    },
+                    animation: {
+                        'pulse-subtle': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 3s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-6px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .light .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #4ade80 0%, #3b82f6 50%, #a855f7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .glow-effect {
+            box-shadow: 0 0 25px -5px rgba(34, 197, 94, 0.3);
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(34, 197, 94, 0.4);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(34, 197, 94, 0.7);
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans transition-colors duration-300 flex flex-col selection:bg-emerald-500 selection:text-white">
+
+    <!-- Navigation Bar -->
+    <header class="border-b border-slate-800/80 bg-slate-900/60 sticky top-0 z-30 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center text-slate-950 font-black text-xl shadow-lg shadow-emerald-500/20 animate-float">
+                    J
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-lg sm:text-xl tracking-tight flex items-center gap-2">
+                        <span>Penerjemah Bahasa Jamal</span>
+                        <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">v2.0</span>
+                    </h1>
+                    <p class="text-xs text-slate-400 hidden sm:block">Afnan Su? Jamalamal Afnan Amal Jhamal Jamalahum Jahanjamal!</p>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-2 sm:space-x-3">
+                <!-- Audio Toggle -->
+                <button id="soundToggleBtn" onclick="toggleSound()" title="Toggle Sound Effects" class="p-2.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white transition-all border border-slate-700/50">
+                    <i class="fas fa-volume-up text-emerald-400" id="soundIcon"></i>
+                </button>
+
+                <!-- Dictionary Modal Trigger -->
+                <button onclick="openDictionaryModal()" class="flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 text-xs sm:text-sm font-semibold border border-emerald-500/30 transition-all">
+                    <i class="fas fa-book-open"></i>
+                    <span class="hidden sm:inline">Kamus Jamal</span>
+                </button>
+
+                <!-- Light/Dark Mode Switcher -->
+                <button id="themeToggleBtn" onclick="toggleTheme()" class="p-2.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white transition-all border border-slate-700/50">
+                    <i class="fas fa-moon text-amber-400" id="themeIcon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 flex flex-col justify-between">
+        
+        <div class="space-y-6">
+            <!-- Hero Header Banner -->
+            <div class="text-center max-w-2xl mx-auto space-y-2 mb-2">
+                <h2 class="text-2xl sm:text-4xl font-extrabold tracking-tight">
+                    Translate to & from <span class="gradient-text">Bahasa Jamal</span>
+                </h2>
+                <p class="text-slate-400 text-xs sm:text-sm">
+                    Konversi teks biasa ke Bahasa Jamal secara real-time. Ketik kata atau kalimat kamu di bawah ini!
+                </p>
+            </div>
+
+            <!-- Translation Mode Controls Bar -->
+            <div class="flex items-center justify-between glass-panel p-2.5 sm:p-3 rounded-2xl shadow-xl">
+                <div class="flex items-center space-x-2 text-xs sm:text-sm font-semibold text-slate-300">
+                    <span id="labelModeLeft" class="px-3 py-1.5 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                        Teks Biasa
+                    </span>
+                    <i class="fas fa-arrow-right text-slate-500 hidden sm:inline"></i>
+                    <span id="labelModeRight" class="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-400 border border-slate-700/50">
+                        Bahasa Jamal
+                    </span>
+                </div>
+
+                <!-- Swap Mode Button -->
+                <button onclick="swapTranslationMode()" class="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-xs sm:text-sm shadow-md transition-all active:scale-95">
+                    <i class="fas fa-right-left text-sm" id="swapIcon"></i>
+                    <span>Tukar Arah</span>
+                </button>
+            </div>
+
+            <!-- Translation Cards Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                
+                <!-- INPUT CARD -->
+                <div class="glass-panel rounded-2xl p-4 sm:p-5 flex flex-col justify-between shadow-xl transition-all focus-within:border-emerald-500/50 focus-within:ring-2 focus-within:ring-emerald-500/20">
+                    <div>
+                        <!-- Input Card Header -->
+                        <div class="flex items-center justify-between mb-3">
+                            <span id="inputBoxTitle" class="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-2">
+                                <i class="fas fa-pen-nib"></i> Teks Asli
+                            </span>
+                            <div class="flex items-center space-x-1">
+                                <button onclick="speakInputText()" title="Dengarkan Suara" class="p-2 text-slate-400 hover:text-emerald-400 transition-colors rounded-lg hover:bg-slate-800/60">
+                                    <i class="fas fa-volume-high"></i>
+                                </button>
+                                <button onclick="clearInput()" title="Bersihkan Teks" class="p-2 text-slate-400 hover:text-rose-400 transition-colors rounded-lg hover:bg-slate-800/60">
+                                    <i class="fas fa-trash-can"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Textarea -->
+                        <textarea id="inputText" rows="6" placeholder="Ketik teks di sini... (Contoh: AFNAN SU)" 
+                            class="w-full bg-transparent text-slate-100 placeholder-slate-500 focus:outline-none resize-none font-mono text-base leading-relaxed"
+                            oninput="handleInput()"></textarea>
+                    </div>
+
+                    <!-- Input Footer Stats -->
+                    <div class="pt-3 mt-2 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
+                        <span id="inputCharCount">0 Karakter</span>
+                        <span id="inputWordCount">0 Kata</span>
+                    </div>
+                </div>
+
+                <!-- OUTPUT CARD -->
+                <div class="glass-panel rounded-2xl p-4 sm:p-5 flex flex-col justify-between shadow-xl border-emerald-500/30 glow-effect relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full filter blur-2xl pointer-events-none"></div>
+
+                    <div>
+                        <!-- Output Card Header -->
+                        <div class="flex items-center justify-between mb-3">
+                            <span id="outputBoxTitle" class="text-xs font-bold uppercase tracking-wider text-teal-400 flex items-center gap-2">
+                                <i class="fas fa-sparkles"></i> Hasil Bahasa Jamal
+                            </span>
+                            <div class="flex items-center space-x-1">
+                                <button onclick="speakOutputText()" title="Dengarkan Teks Jamal" class="p-2 text-slate-400 hover:text-emerald-400 transition-colors rounded-lg hover:bg-slate-800/60">
+                                    <i class="fas fa-volume-high"></i>
+                                </button>
+                                <button onclick="copyOutput()" title="Salin Teks" class="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs rounded-lg transition-all flex items-center gap-1.5 shadow-md active:scale-95">
+                                    <i class="fas fa-copy"></i> Salin
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Output Box Area -->
+                        <div id="outputText" class="w-full min-h-[144px] max-h-[220px] overflow-y-auto text-emerald-300 font-mono text-base leading-relaxed select-all whitespace-pre-wrap break-words">
+                            <span class="text-slate-500 italic font-sans text-sm">Hasil terjemahan akan muncul di sini...</span>
+                        </div>
+                    </div>
+
+                    <!-- Output Footer Stats -->
+                    <div class="pt-3 mt-2 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
+                        <span id="outputCharCount">0 Karakter</span>
+                        <span id="jamalMeter" class="text-emerald-400 font-medium">Ratio: 1.0x</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Quick Presets Bar -->
+            <div class="glass-panel rounded-2xl p-4 shadow-lg space-y-3">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
+                        <i class="fas fa-bolt text-amber-400"></i> Contoh Kalimat Cepat
+                    </h3>
+                    <span class="text-xs text-slate-500">Klik untuk langsung mencoba</span>
+                </div>
+
+                <div class="flex flex-wrap gap-2" id="presetsContainer">
+                    <!-- Dynamic Preset Buttons rendered via JS -->
+                </div>
+            </div>
+
+            <!-- Jamal Fun Analytics & Details Widget -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+                <div class="glass-panel p-3.5 rounded-xl text-center space-y-1">
+                    <span class="text-slate-400 text-xs font-medium">Jamal Index</span>
+                    <p class="text-lg sm:text-xl font-bold text-emerald-400" id="statJamalIndex">99.9%</p>
+                </div>
+                <div class="glass-panel p-3.5 rounded-xl text-center space-y-1">
+                    <span class="text-slate-400 text-xs font-medium">Jumlah Kata Jamal</span>
+                    <p class="text-lg sm:text-xl font-bold text-teal-400" id="statJamalWords">0</p>
+                </div>
+                <div class="glass-panel p-3.5 rounded-xl text-center space-y-1">
+                    <span class="text-slate-400 text-xs font-medium">Perkiraan Waca</span>
+                    <p class="text-lg sm:text-xl font-bold text-cyan-400" id="statReadingTime">0s</p>
+                </div>
+                <div class="glass-panel p-3.5 rounded-xl text-center space-y-1">
+                    <span class="text-slate-400 text-xs font-medium">Status Jamal</span>
+                    <p class="text-xs sm:text-sm font-bold text-amber-400 flex items-center justify-center gap-1 mt-1">
+                        <i class="fas fa-crown text-xs"></i> <span id="statJamalLevel">Siap Jamal</span>
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Footer -->
+        <footer class="mt-10 text-center text-xs text-slate-500 py-4 border-t border-slate-800/50">
+            <p>© 2026 Penerjemah Bahasa Jamal — Dibuat untuk keseruan dan edukasi kosakata Jamal.</p>
+        </footer>
+
+    </main>
+
+    <!-- KAMUS JAMAL MODAL -->
+    <div id="dictModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md opacity-0 pointer-events-none transition-all duration-300">
+        <div class="glass-panel rounded-2xl w-full max-w-3xl max-h-[85vh] flex flex-col shadow-2xl border-slate-700/60 transform scale-95 transition-all duration-300" id="dictModalContent">
+            
+            <!-- Modal Header -->
+            <div class="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-9 h-9 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-base sm:text-lg text-slate-100">Kamus & Kamus Cepat Jamal</h3>
+                        <p class="text-xs text-slate-400">Daftar lengkap pemetaan abjad A-Z dan Spasi ke kata Jamal</p>
+                    </div>
+                </div>
+                <button onclick="closeDictionaryModal()" class="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors">
+                    <i class="fas fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Search Filter Bar -->
+            <div class="p-4 border-b border-slate-800/80 bg-slate-900/40">
+                <div class="relative">
+                    <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                    <input type="text" id="dictSearchInput" placeholder="Cari huruf atau kata Jamal (contoh: A, Afnan, Jhamal)..." 
+                        class="w-full bg-slate-950/80 border border-slate-700/60 rounded-xl pl-10 pr-4 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+                        oninput="filterDictionary()">
+                </div>
+            </div>
+
+            <!-- Modal Body (Grid of Letters) -->
+            <div class="p-4 sm:p-6 overflow-y-auto flex-grow">
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5 sm:gap-3" id="dictGridContainer">
+                    <!-- Rendered by JS -->
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="p-4 border-t border-slate-800 bg-slate-900/50 flex items-center justify-between text-xs text-slate-400">
+                <span>Klik item untuk menyalin kata Jamal</span>
+                <button onclick="closeDictionaryModal()" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold transition-colors">
+                    Tutup
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toastContainer" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <script>
+        // Core Dictionary Mapping (A-Z + Space)
+        const JAMAL_MAP = {
+            'A': 'Amal',
+            'B': 'Jmal',
+            'C': 'Mal',
+            'D': 'Malja',
+            'E': 'lamal',
+            'F': 'Jamalamal',
+            'G': 'MalJam',
+            'H': 'Jamlam',
+            'I': 'Jalam',
+            'J': 'Jamal',
+            'K': 'Jmla',
+            'L': 'Jamla',
+            'M': 'Jammal',
+            'N': 'Afnan',
+            'O': 'Jamalando',
+            'P': 'malamalaJ',
+            'Q': 'Maljamal',
+            'R': 'Jamalamalama',
+            'S': 'Jamalahum',
+            'T': 'Jahanam',
+            'U': 'Jahanjamal',
+            'V': 'Jamaluddin',
+            'W': 'Jamalulu',
+            'X': 'JamalKalxer',
+            'Y': 'Jamrela',
+            'Z': 'JamalKalcer',
+            ' ': 'Jhamal'
+        };
+
+        // Construct Reverse Mapping (Lowercase Jamal Word -> Single Character or Space)
+        const REVERSE_JAMAL_MAP = {};
+        Object.entries(JAMAL_MAP).forEach(([char, jamalWord]) => {
+            REVERSE_JAMAL_MAP[jamalWord.toLowerCase()] = char;
+        });
+
+        // App State
+        let isTextToJamal = true; // true: Text -> Jamal, false: Jamal -> Text
+        let soundEnabled = true;
+
+        // Audio Synthesizer for UI feedback using Web Audio API
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(type) {
+            if (!soundEnabled) return;
+            try {
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                const now = audioCtx.currentTime;
+
+                if (type === 'type') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(440, now);
+                    osc.frequency.exponentialRampToValueAtTime(880, now + 0.05);
+                    gain.gain.setValueAtTime(0.05, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+                    osc.start(now);
+                    osc.stop(now + 0.05);
+                } else if (type === 'swap') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(300, now);
+                    osc.frequency.exponentialRampToValueAtTime(600, now + 0.12);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+                    osc.start(now);
+                    osc.stop(now + 0.12);
+                } else if (type === 'copy') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, now); // C5
+                    osc.frequency.setValueAtTime(659.25, now + 0.08); // E5
+                    osc.frequency.setValueAtTime(783.99, now + 0.16); // G5
+                    gain.gain.setValueAtTime(0.08, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+                    osc.start(now);
+                    osc.stop(now + 0.25);
+                }
+            } catch (e) {
+                // Audio Context fallback silent
+            }
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            const icon = document.getElementById('soundIcon');
+            if (soundEnabled) {
+                icon.className = 'fas fa-volume-up text-emerald-400';
+                showToast('Efek suara diaktifkan');
+            } else {
+                icon.className = 'fas fa-volume-mute text-slate-500';
+                showToast('Efek suara dimatikan');
+            }
+        }
+
+        // ENCODE: Teks Biasa -> Jamal Language
+        function encodeTextToJamal(text) {
+            if (!text) return '';
+            
+            const lines = text.split('\n');
+            const encodedLines = lines.map(line => {
+                const words = [];
+                for (let i = 0; i < line.length; i++) {
+                    const char = line[i];
+                    const upperChar = char.toUpperCase();
+                    
+                    if (JAMAL_MAP[upperChar]) {
+                        words.push(JAMAL_MAP[upperChar]);
+                    } else {
+                        // Preserves numbers, punctuation, or non-alphabet characters
+                        words.push(char);
+                    }
+                }
+                return words.join(' ');
+            });
+
+            return encodedLines.join('\n');
+        }
+
+        // DECODE: Jamal Language -> Teks Biasa
+        function decodeJamalToText(jamalText) {
+            if (!jamalText) return '';
+
+            const lines = jamalText.split('\n');
+            const decodedLines = lines.map(line => {
+                // Split tokens by whitespace
+                const tokens = line.trim().split(/\s+/);
+                let resultText = '';
+
+                tokens.forEach(token => {
+                    if (!token) return;
+
+                    // Clean punctuation attached to word if any
+                    const match = token.match(/^([^\w]*)([\w]+)([^\w]*)$/);
+                    if (match) {
+                        const prefix = match[1];
+                        const coreWord = match[2].toLowerCase();
+                        const suffix = match[3];
+
+                        if (REVERSE_JAMAL_MAP[coreWord] !== undefined) {
+                            resultText += prefix + REVERSE_JAMAL_MAP[coreWord] + suffix;
+                        } else {
+                            resultText += token + ' ';
+                        }
+                    } else {
+                        const lowerToken = token.toLowerCase();
+                        if (REVERSE_JAMAL_MAP[lowerToken] !== undefined) {
+                            resultText += REVERSE_JAMAL_MAP[lowerToken];
+                        } else {
+                            resultText += token;
+                        }
+                    }
+                });
+
+                return resultText;
+            });
+
+            return decodedLines.join('\n');
+        }
+
+        // Handle Live Input
+        function handleInput() {
+            const inputVal = document.getElementById('inputText').value;
+            const outputBox = document.getElementById('outputText');
+            
+            playSound('type');
+
+            let result = '';
+            if (isTextToJamal) {
+                result = encodeTextToJamal(inputVal);
+            } else {
+                result = decodeJamalToText(inputVal);
+            }
+
+            if (result.trim() === '') {
+                outputBox.innerHTML = `<span class="text-slate-500 italic font-sans text-sm">Hasil terjemahan akan muncul di sini...</span>`;
+            } else {
+                outputBox.innerText = result;
+            }
+
+            updateStats(inputVal, result);
+        }
+
+        // Text-to-Speech Helper
+        function speakText(text, isJamal = false) {
+            if (!text || text.trim() === '') {
+                showToast('Tidak ada teks untuk dibaca', true);
+                return;
+            }
+
+            if (!('speechSynthesis' in window)) {
+                showToast('Fitur Suara tidak didukung browser ini', true);
+                return;
+            }
+
+            window.speechSynthesis.cancel(); // Stop active speech
+
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'id-ID';
+            utterance.rate = isJamal ? 0.9 : 1.0;
+            utterance.pitch = isJamal ? 1.1 : 1.0;
+
+            window.speechSynthesis.speak(utterance);
+            showToast('Membaca teks...');
+        }
+
+        function speakInputText() {
+            const val = document.getElementById('inputText').value;
+            speakText(val, !isTextToJamal);
+        }
+
+        function speakOutputText() {
+            const val = document.getElementById('outputText').innerText;
+            if (val.includes('Hasil terjemahan akan muncul')) return;
+            speakText(val, isTextToJamal);
+        }
+
+        // Swap Translation Direction
+        function swapTranslationMode() {
+            isTextToJamal = !isTextToJamal;
+            playSound('swap');
+
+            // UI Animations for Swap
+            const swapIcon = document.getElementById('swapIcon');
+            swapIcon.classList.add('rotate-180');
+            setTimeout(() => swapIcon.classList.remove('rotate-180'), 300);
+
+            const labelLeft = document.getElementById('labelModeLeft');
+            const labelRight = document.getElementById('labelModeRight');
+            const inputBoxTitle = document.getElementById('inputBoxTitle');
+            const outputBoxTitle = document.getElementById('outputBoxTitle');
+
+            if (isTextToJamal) {
+                labelLeft.innerText = "Teks Biasa";
+                labelLeft.className = "px-3 py-1.5 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
+                labelRight.innerText = "Bahasa Jamal";
+                labelRight.className = "px-3 py-1.5 rounded-lg bg-slate-800 text-slate-400 border border-slate-700/50";
+                
+                inputBoxTitle.innerHTML = `<i class="fas fa-pen-nib"></i> Teks Asli`;
+                outputBoxTitle.innerHTML = `<i class="fas fa-sparkles"></i> Hasil Bahasa Jamal`;
+                document.getElementById('inputText').placeholder = "Ketik teks di sini... (Contoh: AFNAN SU)";
+            } else {
+                labelLeft.innerText = "Bahasa Jamal";
+                labelLeft.className = "px-3 py-1.5 rounded-lg bg-teal-500/20 text-teal-300 border border-teal-500/30";
+                labelRight.innerText = "Teks Biasa";
+                labelRight.className = "px-3 py-1.5 rounded-lg bg-slate-800 text-slate-400 border border-slate-700/50";
+
+                inputBoxTitle.innerHTML = `<i class="fas fa-sparkles"></i> Teks Bahasa Jamal`;
+                outputBoxTitle.innerHTML = `<i class="fas fa-pen-nib"></i> Hasil Teks Biasa`;
+                document.getElementById('inputText').placeholder = "Masukkan kata Jamal di sini... (Contoh: Amal Jamalamal Afnan)";
+            }
+
+            // Move current output into input
+            const currentOutput = document.getElementById('outputText').innerText;
+            if (!currentOutput.includes('Hasil terjemahan akan muncul')) {
+                document.getElementById('inputText').value = currentOutput;
+            } else {
+                document.getElementById('inputText').value = '';
+            }
+
+            handleInput();
+            showToast(`Mode diubah: ${isTextToJamal ? 'Teks -> Jamal' : 'Jamal -> Teks'}`);
+        }
+
+        // Copy Result to Clipboard
+        function copyOutput() {
+            const outputText = document.getElementById('outputText').innerText;
+            if (!outputText || outputText.includes('Hasil terjemahan akan muncul')) {
+                showToast('Tidak ada teks untuk disalin!', true);
+                return;
+            }
+
+            // Reliable copy fallback using temporary textarea
+            const tempArea = document.createElement('textarea');
+            tempArea.value = outputText;
+            tempArea.style.position = 'fixed';
+            tempArea.style.left = '-9999px';
+            document.body.appendChild(tempArea);
+            tempArea.select();
+            
+            try {
+                document.execCommand('copy');
+                playSound('copy');
+                showToast('Teks berhasil disalin! 📋');
+            } catch (err) {
+                showToast('Gagal menyalin teks', true);
+            }
+            document.body.removeChild(tempArea);
+        }
+
+        function clearInput() {
+            document.getElementById('inputText').value = '';
+            handleInput();
+            showToast('Input dibersihkan');
+        }
+
+        // Presets Setup
+        const PRESETS = [
+            { label: 'AFNAN SU', text: 'AFNAN SU' },
+            { label: 'HALO DUNIA', text: 'HALO DUNIA' },
+            { label: 'JAMAL SAKTI', text: 'JAMAL SAKTI' },
+            { label: 'BELAJAR BAHASA JAMAL', text: 'BELAJAR BAHASA JAMAL' },
+            { label: 'SOS', text: 'SOS' },
+            { label: 'SAYA CINTA JAMAL', text: 'SAYA CINTA JAMAL' }
+        ];
+
+        function renderPresets() {
+            const container = document.getElementById('presetsContainer');
+            container.innerHTML = '';
+            PRESETS.forEach(preset => {
+                const btn = document.createElement('button');
+                btn.className = 'px-3 py-1.5 rounded-lg bg-slate-800/80 hover:bg-emerald-500/20 text-slate-300 hover:text-emerald-300 border border-slate-700/60 hover:border-emerald-500/40 text-xs font-mono transition-all';
+                btn.innerText = preset.label;
+                btn.onclick = () => {
+                    if (!isTextToJamal) swapTranslationMode();
+                    document.getElementById('inputText').value = preset.text;
+                    handleInput();
+                    showToast(`Contoh "${preset.label}" dimuat`);
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        // Update Statistics & Analytics
+        function updateStats(input, output) {
+            const inputLen = input.length;
+            const inputWords = input.trim() ? input.trim().split(/\s+/).length : 0;
+            
+            document.getElementById('inputCharCount').innerText = `${inputLen} Karakter`;
+            document.getElementById('inputWordCount').innerText = `${inputWords} Kata`;
+
+            const outputLen = output.includes('Hasil terjemahan akan muncul') ? 0 : output.length;
+            document.getElementById('outputCharCount').innerText = `${outputLen} Karakter`;
+
+            // Ratio & Jamal Words
+            const ratio = inputLen > 0 ? (outputLen / inputLen).toFixed(1) : '1.0';
+            document.getElementById('jamalMeter').innerText = `Ratio: ${ratio}x`;
+
+            const jamalWordCount = output.trim() && !output.includes('Hasil terjemahan akan muncul') ? output.trim().split(/\s+/).length : 0;
+            document.getElementById('statJamalWords').innerText = jamalWordCount;
+
+            // Reading time estimation (average 150 words per minute)
+            const seconds = Math.ceil((jamalWordCount / 150) * 60);
+            document.getElementById('statReadingTime').innerText = `${seconds}s`;
+
+            // Dynamic Level Badge
+            const levelElem = document.getElementById('statJamalLevel');
+            if (jamalWordCount === 0) levelElem.innerText = 'Siap Jamal';
+            else if (jamalWordCount < 5) levelElem.innerText = 'Jamal Pemula';
+            else if (jamalWordCount < 15) levelElem.innerText = 'Jamal Cerdas';
+            else if (jamalWordCount < 30) levelElem.innerText = 'Jamal Master';
+            else levelElem.innerText = 'Suhu Jamal 👑';
+        }
+
+        // Dictionary Modal Logic
+        function renderDictionaryGrid(filterQuery = '') {
+            const grid = document.getElementById('dictGridContainer');
+            grid.innerHTML = '';
+
+            const entries = Object.entries(JAMAL_MAP);
+            const query = filterQuery.toLowerCase().trim();
+
+            entries.forEach(([letter, jamalWord]) => {
+                const letterDisplay = letter === ' ' ? 'Spasi' : letter;
+                
+                if (query && !letterDisplay.toLowerCase().includes(query) && !jamalWord.toLowerCase().includes(query)) {
+                    return;
+                }
+
+                const card = document.createElement('div');
+                card.className = 'glass-panel p-3 rounded-xl border border-slate-700/60 hover:border-emerald-500/50 hover:bg-slate-800/80 transition-all cursor-pointer flex items-center justify-between group';
+                card.onclick = () => {
+                    copyToClipboardText(jamalWord);
+                    showToast(`Disalin: ${letterDisplay} -> ${jamalWord}`);
+                };
+
+                card.innerHTML = `
+                    <div class="flex items-center space-x-2.5">
+                        <span class="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold flex items-center justify-center text-sm group-hover:scale-105 transition-transform">
+                            ${letterDisplay}
+                        </span>
+                        <div>
+                            <p class="font-mono font-semibold text-sm text-slate-200 group-hover:text-emerald-300 transition-colors">${jamalWord}</p>
+                            <span class="text-[10px] text-slate-500">Klik untuk menyalin</span>
+                        </div>
+                    </div>
+                    <i class="fas fa-copy text-xs text-slate-600 group-hover:text-emerald-400 transition-colors"></i>
+                `;
+
+                grid.appendChild(card);
+            });
+
+            if (grid.children.length === 0) {
+                grid.innerHTML = `<div class="col-span-full py-8 text-center text-slate-500 text-sm">Tidak ditemukan kata Jamal yang cocok.</div>`;
+            }
+        }
+
+        function filterDictionary() {
+            const q = document.getElementById('dictSearchInput').value;
+            renderDictionaryGrid(q);
+        }
+
+        function openDictionaryModal() {
+            const modal = document.getElementById('dictModal');
+            const content = document.getElementById('dictModalContent');
+            renderDictionaryGrid();
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            content.classList.remove('scale-95');
+            content.classList.add('scale-100');
+        }
+
+        function closeDictionaryModal() {
+            const modal = document.getElementById('dictModal');
+            const content = document.getElementById('dictModalContent');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            content.classList.remove('scale-100');
+            content.classList.add('scale-95');
+        }
+
+        function copyToClipboardText(str) {
+            const temp = document.createElement('textarea');
+            temp.value = str;
+            document.body.appendChild(temp);
+            temp.select();
+            document.execCommand('copy');
+            document.body.removeChild(temp);
+            playSound('copy');
+        }
+
+        // Toast Notification System
+        function showToast(message, isError = false) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            
+            toast.className = `px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold shadow-xl border flex items-center gap-2 transform translate-y-4 opacity-0 transition-all duration-300 pointer-events-auto ${
+                isError 
+                ? 'bg-rose-900/90 text-rose-200 border-rose-700/80' 
+                : 'bg-emerald-950/90 text-emerald-200 border-emerald-600/80'
+            }`;
+
+            toast.innerHTML = `
+                <i class="fas ${isError ? 'fa-circle-exclamation text-rose-400' : 'fa-circle-check text-emerald-400'}"></i>
+                <span>${message}</span>
+            `;
+
+            container.appendChild(toast);
+
+            // Animate In
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-y-4', 'opacity-0');
+            });
+
+            // Auto Remove
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 2500);
+        }
+
+        // Light/Dark Theme Switcher
+        function toggleTheme() {
+            const html = document.documentElement;
+            const icon = document.getElementById('themeIcon');
+            
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                html.classList.add('light');
+                icon.className = 'fas fa-sun text-amber-500';
+                showToast('Tema terang diaktifkan');
+            } else {
+                html.classList.remove('light');
+                html.classList.add('dark');
+                icon.className = 'fas fa-moon text-amber-400';
+                showToast('Tema gelap diaktifkan');
+            }
+        }
+
+        // Initialize App on Load
+        window.addEventListener('DOMContentLoaded', () => {
+            renderPresets();
+            handleInput();
+
+            // Keyboard Shortcuts: ESC closes modal
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    closeDictionaryModal();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
